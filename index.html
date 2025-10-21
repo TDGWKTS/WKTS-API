@@ -3,16 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Transfer Stations Dashboard - BigQuery</title>
+    <title>Transfer Stations Dashboard - BigQuery Direct</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* 保持相同的樣式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
-            margin: 0;
         }
         
         .container {
@@ -32,6 +36,36 @@
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
         
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .station-selector {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .station-selector select {
+            padding: 12px 20px;
+            font-size: 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            background: white;
+            min-width: 250px;
+            transition: all 0.3s ease;
+        }
+        
+        .station-selector select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -45,13 +79,49 @@
             border-radius: 15px;
             box-shadow: 0 8px 25px rgba(0,0,0,0.1);
             text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
         
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: white;
-            font-size: 1.1rem;
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.15);
+        }
+        
+        .stat-card h3 {
+            color: #6c757d;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .stat-card p {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .charts-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .chart-container {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        
+        .chart-container h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            border-bottom: 2px solid #f8f9fa;
+            padding-bottom: 10px;
         }
         
         .data-table-container {
@@ -62,9 +132,32 @@
             margin-bottom: 30px;
         }
         
+        .data-table-container h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: white;
+            font-size: 1.1rem;
+        }
+        
+        .error {
+            color: #e74c3c;
+            background: rgba(231, 76, 60, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #e74c3c;
+            text-align: center;
+        }
+        
         table {
             width: 100%;
             border-collapse: collapse;
+            margin-top: 10px;
         }
         
         th, td {
@@ -76,6 +169,25 @@
         th {
             background-color: #f8f9fa;
             font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        @media (max-width: 768px) {
+            .charts-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .stat-card p {
+                font-size: 1.5rem;
+            }
         }
     </style>
 </head>
@@ -83,7 +195,7 @@
     <div class="container">
         <div class="header">
             <h1>🚛 Transfer Stations Dashboard</h1>
-            <p>Powered by BigQuery - 1.75M+ records</p>
+            <p>Direct BigQuery Connection - Real Data</p>
         </div>
 
         <div class="station-selector">
@@ -93,7 +205,19 @@
         </div>
 
         <div class="stats-grid" id="statsGrid">
-            <div class="loading">🔄 Loading data from BigQuery...</div>
+            <div class="loading">🔄 Connecting to BigQuery...</div>
+        </div>
+
+        <div class="charts-container">
+            <div class="chart-container">
+                <h3>📈 Daily Weight Trends</h3>
+                <canvas id="weightChart" height="250"></canvas>
+            </div>
+
+            <div class="chart-container">
+                <h3>📊 Status Distribution</h3>
+                <canvas id="statusChart" height="250"></canvas>
+            </div>
         </div>
 
         <div class="data-table-container">
@@ -104,6 +228,6 @@
         </div>
     </div>
 
-    <script src="bigquery-dashboard.js"></script>
+    <script src="bigquery-dashboard-direct.js"></script>
 </body>
 </html>
